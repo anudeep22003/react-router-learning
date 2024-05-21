@@ -1,4 +1,5 @@
-import { Form } from "react-router-dom";
+import { Form, useLoaderData, LoaderFunction, Params } from "react-router-dom";
+import { getContact } from "../contacts";
 
 export type ContactType = {
   id: string;
@@ -10,17 +11,45 @@ export type ContactType = {
   favorite: boolean;
 };
 
+type LoaderData = {
+  contact: ContactType | null;
+};
+
+const loader: LoaderFunction = async ({
+  params,
+}: {
+  params: Params<string>;
+}) => {
+  const contactId = params.contactId as string;
+  const contact = await getContact(contactId);
+  return { contact };
+};
+
 // export default function Contact(contact: Contact = defaultContact) {
 export default function Contact() {
-  const contact: ContactType = {
-    id: "0",
-    first: "Your",
-    last: "Name",
-    avatar: "https://picsum.photos/id/1/200/200",
-    twitter: "your_handle",
-    notes: "Some notes",
-    favorite: true,
-  };
+  let { contact } = useLoaderData() as LoaderData;
+
+  if (!contact) {
+    contact = {
+      id: "",
+      first: "",
+      last: "",
+      avatar: "",
+      twitter: "",
+      notes: "",
+      favorite: false,
+    };
+  }
+
+  // const contact: ContactType = {
+  //   id: "0",
+  //   first: "Your",
+  //   last: "Name",
+  //   avatar: "https://picsum.photos/id/1/200/200",
+  //   twitter: "your_handle",
+  //   notes: "Some notes",
+  //   favorite: true,
+  // };
   return (
     <div id="contact">
       <div>
@@ -89,3 +118,5 @@ function Favorite(props: FavoriteProps) {
     </Form>
   );
 }
+
+export { loader };

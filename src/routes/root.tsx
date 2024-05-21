@@ -6,7 +6,7 @@ type LoaderData = {
   contacts: ContactType[];
 };
 
-const loader = async (): Promise<LoaderData> => {
+const loader = async () => {
   const contacts: ContactType[] = await getContacts();
   return { contacts };
 };
