@@ -3,6 +3,7 @@ import {
   useLoaderData,
   Form,
   redirect,
+  useNavigation,
   NavLink,
 } from "react-router-dom";
 import { createContact, getContacts } from "../contacts";
@@ -33,6 +34,8 @@ const action = async () => {
 };
 
 function Root() {
+  // navigation.state: "idle" | "submitting" | "loading"
+  const navigation = useNavigation();
   const { contacts } = useLoaderData() as LoaderData;
   return (
     <>
@@ -82,7 +85,10 @@ function Root() {
           )}
         </nav>
       </div>
-      <div id="detail">
+      <div
+        id="detail"
+        className={navigation.state === "loading" ? "loading" : ""}
+      >
         <Outlet />
       </div>
     </>
