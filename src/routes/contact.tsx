@@ -11,8 +11,18 @@ export type ContactType = {
   favorite: boolean;
 };
 
-type LoaderData = {
-  contact: ContactType | null;
+type ContactNewType = {
+  id: string;
+  first?: string;
+  last?: string;
+  avatar?: string;
+  twitter?: string;
+  notes?: string;
+  favorite?: boolean;
+};
+
+export type ContactLoaderData = {
+  contact: ContactType | ContactNewType;
 };
 
 const loader: LoaderFunction = async ({
@@ -22,24 +32,15 @@ const loader: LoaderFunction = async ({
 }) => {
   const contactId = params.contactId as string;
   const contact = await getContact(contactId);
+  if (!contact) {
+    return { contact: { id: contactId } };
+  }
   return { contact };
 };
 
 // export default function Contact(contact: Contact = defaultContact) {
 export default function Contact() {
-  let { contact } = useLoaderData() as LoaderData;
-
-  if (!contact) {
-    contact = {
-      id: "",
-      first: "",
-      last: "",
-      avatar: "",
-      twitter: "",
-      notes: "",
-      favorite: false,
-    };
-  }
+  const { contact } = useLoaderData() as ContactLoaderData;
 
   // const contact: ContactType = {
   //   id: "0",
@@ -100,12 +101,12 @@ export default function Contact() {
 }
 
 type FavoriteProps = {
-  contact: ContactType;
+  contact: ContactType | ContactNewType;
 };
 
 function Favorite(props: FavoriteProps) {
   // yes, this is a `let` for later
-  const favorite = props.contact.favorite;
+  const favorite = props.contact.favorite || false;
   return (
     <Form method="post">
       <button
