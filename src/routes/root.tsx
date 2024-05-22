@@ -5,17 +5,22 @@ import {
   redirect,
   useNavigation,
   NavLink,
+  LoaderFunction,
 } from "react-router-dom";
 import { createContact, getContacts } from "../contacts";
 import { ContactType } from "./contact";
+import { useEffect } from "react";
 
 type LoaderData = {
   contacts: ContactType[];
+  q: string | null;
 };
 
-const loader = async () => {
-  const contacts: ContactType[] = await getContacts();
-  return { contacts };
+const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const contacts: ContactType[] = await getContacts(q);
+  return { contacts, q };
 };
 
 type ContactCreateType = {
@@ -36,23 +41,31 @@ const action = async () => {
 function Root() {
   // navigation.state: "idle" | "submitting" | "loading"
   const navigation = useNavigation();
-  const { contacts } = useLoaderData() as LoaderData;
+  const { contacts, q } = useLoaderData() as LoaderData;
+
+  useEffect(() => {
+    //\
+    const queryElement = document.getElementById("q") as HTMLInputElement;
+    queryElement.value = q || "";
+  }, [q]);
+
   return (
     <>
       <div id="sidebar">
         <h1>React Router Contacts</h1>
         <div>
-          <form id="search-form" role="search">
+          <Form id="search-form" role="search">
             <input
               id="q"
               aria-label="Search contacts"
               placeholder="Search"
               type="search"
               name="q"
+              defaultValue={q || ""}
             />
             <div id="search-spinner" aria-hidden hidden={true} />
             <div className="sr-only" aria-live="polite"></div>
-          </form>
+          </Form>
           <Form method="post">
             <button type="submit">New</button>
           </Form>
