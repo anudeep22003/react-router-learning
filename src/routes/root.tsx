@@ -6,6 +6,7 @@ import {
   useNavigation,
   NavLink,
   LoaderFunction,
+  useSubmit,
 } from "react-router-dom";
 import { createContact, getContacts } from "../contacts";
 import { ContactType } from "./contact";
@@ -42,6 +43,11 @@ function Root() {
   // navigation.state: "idle" | "submitting" | "loading"
   const navigation = useNavigation();
   const { contacts, q } = useLoaderData() as LoaderData;
+  const submit = useSubmit();
+
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has("q");
 
   useEffect(() => {
     //\
@@ -62,8 +68,15 @@ function Root() {
               type="search"
               name="q"
               defaultValue={q || ""}
+              className={searching ? "loading" : ""}
+              onChange={(event) => {
+                const isFirstSearch = q == null;
+                submit(event.currentTarget.form, {
+                  replace: !isFirstSearch,
+                });
+              }}
             />
-            <div id="search-spinner" aria-hidden hidden={true} />
+            <div id="search-spinner" aria-hidden hidden={!searching} />
             <div className="sr-only" aria-live="polite"></div>
           </Form>
           <Form method="post">
