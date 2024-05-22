@@ -7,7 +7,10 @@ import Root, {
   action as rootAction,
 } from "./routes/root";
 import ErrorPage from "./error-page";
-import Contact, { loader as contactLoader } from "./routes/contact";
+import Contact, {
+  loader as contactLoader,
+  action as favoriteAction,
+} from "./routes/contact";
 import EditContact, { action as contactEditAction } from "./routes/edit";
 import { action as destroyAction } from "./routes/destroy";
 import Index from "./routes/index";
@@ -20,22 +23,27 @@ const router = createBrowserRouter([
     loader: rootLoader,
     action: rootAction,
     children: [
-      { index: true, element: <Index /> },
       {
-        path: "/contacts/:contactId",
-        element: <Contact />,
-        loader: contactLoader,
-      },
-      {
-        path: "/contacts/:contactId/edit",
-        element: <EditContact />,
-        loader: contactLoader,
-        action: contactEditAction,
-      },
-      {
-        path: "/contacts/:contactId/destroy",
-        action: destroyAction,
         errorElement: <ErrorPage />,
+        children: [
+          { index: true, element: <Index /> },
+          {
+            path: "/contacts/:contactId",
+            element: <Contact />,
+            loader: contactLoader,
+            action: favoriteAction,
+          },
+          {
+            path: "/contacts/:contactId/edit",
+            element: <EditContact />,
+            loader: contactLoader,
+            action: contactEditAction,
+          },
+          {
+            path: "/contacts/:contactId/destroy",
+            action: destroyAction,
+          },
+        ],
       },
     ],
   },
